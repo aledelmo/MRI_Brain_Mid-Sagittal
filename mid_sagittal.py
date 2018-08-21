@@ -16,10 +16,13 @@ def main():
     img, affine, _ = load_nii(image_fname)
 
     plane, eq = get_left_right(img, affine)
-    if out_fname.endswith('.nii') or out_fname.endswith('.nii.gz'):
-        save_nii(out_fname, plane, affine)
+    if out_fname:
+        if out_fname.endswith('.nii') or out_fname.endswith('.nii.gz'):
+            save_nii(out_fname, plane, affine)
+        else:
+            save_txt(out_fname, eq)
     else:
-        save_txt(out_fname, eq)
+        print('Plane equation: {}'.format(eq))
 
 
 def setup():
@@ -29,7 +32,7 @@ def setup():
 
     args = parser.parse_args()
 
-    return args.Parcellation, args.output
+    return args.Image, args.output
 
 
 def check_nii(value):
