@@ -53,8 +53,8 @@ def covariance_matrix(img):
 
     for i in range(cov.shape[0]):
         for j in range(cov.shape[1]):
-            cov[i, j] = (((voxels[:, 0] - mass[0]) ** cov[i, j][0] * (voxels[:, 1] - mass[1]) ** cov[i, j][1] * (
-                    voxels[:, 2] - mass[2]) ** cov[i, j][2]) * flattened).sum()
+            cov[i, j] = ((((voxels[:, 0] - mass[0]) ** cov[i, j][0]) * ((voxels[:, 1] - mass[1]) ** cov[i, j][1]) * ((
+                    voxels[:, 2] - mass[2]) ** cov[i, j][2])) * flattened).sum()
     cov = np.array(cov, dtype=float)
     _, v = np.linalg.eig(cov.astype('float'))
 
