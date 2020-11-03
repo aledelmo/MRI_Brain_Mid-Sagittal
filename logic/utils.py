@@ -1,14 +1,12 @@
 import numpy as np
 import nibabel as nib
+from scipy.ndimage import generate_binary_structure, binary_dilation
 
 
 def load_nii(path):
     img = nib.load(path)
     canonical_img = nib.as_closest_canonical(img)
-    canonical_data = canonical_img.get_data()
-    canonical_affine = canonical_img.affine
-    canonical_vox = canonical_img.header.get_zooms()
-    return canonical_data, canonical_affine, canonical_vox
+    return canonical_img.get_fdata(), canonical_img.affine
 
 
 def save_nii(path, data, affine):
@@ -16,8 +14,22 @@ def save_nii(path, data, affine):
     nib.save(img, path)
 
 
-def save_txt(path, data):
-    data.tofile(path, ' ', format='%f')
+def split_img_with_plane(img, eq):
+    voxel = combinator(*img.shape)
+    voxel = voxel[:, 0] * eq[0] + voxel[:, 1] * eq[1] + voxel[:, 2] * eq[2] - eq[3]
+    voxel = np.reshape(np.array(voxel), img.shape)
+
+    left_side = np.zeros_like(voxel)
+    right_side = np.zeros_like(voxel)
+
+    left_side[voxel < 0] = 1
+    right_side[voxel >= 0] = 1
+
+    struct = generate_binary_structure(3, 3)
+    plane = np.logical_or(np.logical_and(left_side, binary_dilation(right_side, struct)),
+                          np.logical_and(right_side, binary_dilation(left_side, struct)))
+
+    return plane
 
 
 def combinator(*args):

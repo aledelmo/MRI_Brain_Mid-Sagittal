@@ -1,9 +1,9 @@
 import numpy as np
 from dipy.align.imaffine import AffineMap
-from .utils import combinator
-from scipy.ndimage.measurements import center_of_mass
 from scipy.optimize import minimize
-from scipy.ndimage import generate_binary_structure, binary_dilation
+from scipy.ndimage.measurements import center_of_mass
+
+from .utils import combinator
 
 
 def l2_images(a, b):
@@ -61,7 +61,7 @@ def covariance_matrix(img):
     return cov, v, mass
 
 
-def get_left_right(img, affine):
+def get_symmetry_plane(img, affine):
     print('Initializing mid-sagittal plane...')
     _, v, mass = covariance_matrix(img)
     sym_eig = [symmetry(v[:, i], img, affine) for i in range(v.shape[1])]
@@ -72,20 +72,6 @@ def get_left_right(img, affine):
     eq = best_plane.x
     d = (eq * mass).sum()
 
-    voxel = combinator(*img.shape)
-    voxel = voxel[:, 0] * eq[0] + voxel[:, 1] * eq[1] + voxel[:, 2] * eq[2] - d
-    voxel = np.reshape(np.array(voxel), img.shape)
-
-    left_side = np.zeros_like(voxel)
-    right_side = np.zeros_like(voxel)
-
-    left_side[voxel < 0] = 1
-    right_side[voxel >= 0] = 1
-
-    struct = generate_binary_structure(3, 3)
-    plane = np.logical_or(np.logical_and(left_side, binary_dilation(right_side, struct)),
-                          np.logical_and(right_side, binary_dilation(left_side, struct)))
-
     eq = np.append(eq, d)
 
-    return plane, eq
+    return eq

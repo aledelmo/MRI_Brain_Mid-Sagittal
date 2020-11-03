@@ -108,6 +108,3 @@ venv.bak/
 
 # pycharm
 .idea/
-
-# jupyter
-notebook/
