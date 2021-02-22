@@ -7,8 +7,8 @@ import argparse
 from time import time
 from inspect import currentframe, getframeinfo
 
-from logic import get_symmetry_plane, split_img_with_plane
-from logic.utils import MidSagittalError, load_nii, save_nii
+from symmetry import get_symmetry_plane, split_img_with_plane
+from symmetry.utils import MidSagittalError, load_nii, save_nii
 
 __author__ = 'Alessandro Delmonte'
 __email__ = 'delmonte.ale92@gmail.com'
